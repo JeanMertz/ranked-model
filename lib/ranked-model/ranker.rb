@@ -29,7 +29,7 @@ module RankedModel
 
         validate_ranker_for_instance!
       end
-      
+
       def validate_ranker_for_instance!
         if ranker.scope && !instance_class.respond_to?(ranker.scope)
           raise RankedModel::InvalidScope, %Q{No scope called "#{ranker.scope}" found in model}
@@ -198,7 +198,11 @@ module RankedModel
         @finder ||= begin
           _finder = instance_class
           if ranker.scope
-            _finder = _finder.send ranker.scope
+            if _finder.method(ranker.scope).arity == 0
+              _finder = _finder.send ranker.scope
+            else
+              _finder = _finder.send ranker.scope, instance
+            end
           end
           case ranker.with_same
             when Symbol
