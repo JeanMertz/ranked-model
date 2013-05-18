@@ -223,7 +223,9 @@ module RankedModel
             _finder = _finder.where \
               instance_class.arel_table[:id].not_eq(instance.id)
           end
-          _finder.order(instance_class.arel_table[ranker.column].asc).select([instance_class.arel_table[:id], instance_class.arel_table[ranker.column]])
+            _select = [instance_class.arel_table[:id], instance_class.arel_table[ranker.column]]
+            _select.concat [ranker.with_same].flatten if ranker.with_same
+          _finder.order(instance_class.arel_table[ranker.column].asc).select(_select)
         end
       end
 
